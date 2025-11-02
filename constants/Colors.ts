@@ -1,0 +1,38 @@
+export const Colors = {
+  light: {
+    background: '#FFFFFF',
+    text: '#000000',
+    textSecondary: '#666666',
+    inputBackground: '#FFFFFF',
+    inputBorder: '#E5E5E5',
+    inputPlaceholder: '#999999',
+    primary: '#6A994E',
+    primaryShadow: '#6A994E',
+    buttonText: '#FFFFFF',
+    inactiveProgress: '#E5E5E5',
+    divider: '#E5E5E5',
+    socialButtonBg: '#FFFFFF',
+    disabledButton: '#F5F5F5',
+    disabledButtonText: '#999999',
+    backIcon: '#000000',
+  },
+  dark: {
+    background: '#1A1A1A',
+    text: '#FFFFFF',
+    textSecondary: '#B0B0B0',
+    inputBackground: '#2A2A2A',
+    inputBorder: '#3A3A3A',
+    inputPlaceholder: '#808080',
+    primary: '#6A994E',
+    primaryShadow: '#6A994E',
+    buttonText: '#FFFFFF',
+    inactiveProgress: '#3A3A3A',
+    divider: '#3A3A3A',
+    socialButtonBg: '#2A2A2A',
+    disabledButton: '#2A2A2A',
+    disabledButtonText: '#808080',
+    backIcon: '#FFFFFF',
+  },
+};
+
+
