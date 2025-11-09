@@ -438,9 +438,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **⭐ Star this repo if you found it helpful!**
-[![GitHub stars](https://img.shields.io/github/stars/berenars/codeiq?style=social)](https://github.com/berenars/codeiq)
+[![GitHub stars](https://img.shields.io/github/stars/berenars/CodeIQ?style=social)](https://github.com/berenars/CodeIQ)
 
 
 Made with ❤️ and ☕
+
 
 
