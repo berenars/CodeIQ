@@ -63,7 +63,7 @@ CodeIQ is a cross-platform educational app designed to help students master comp
 - Animated podium reveal for final rankings
 - Synchronized gameplay across all devices
 
-### 🧠 AI-Powered Question Generation
+### 🧠 AI-Powered Question Generation (Offline Mode)
 ```
 // DeepSeek AI integration via Supabase Edge Functions
 export async function generateOfflineQuestions(
@@ -255,7 +255,9 @@ CREATE TABLE players (
 4. Repeat until all questions answered
 5. Display final podium → Navigate home
 
-
+## 💰 API Cost
+**Used 30,000 tokens (0.01$) to generate 52 questions using DeepSeek API**
+![Logo](usage.png)
 ---
 
 ## 💻 Code Highlights
@@ -302,7 +304,7 @@ at ${difficulty} difficulty for level ${level}. Return JSON with this structure:
   });
 });
 ```
-
+**Note:** This is a shortened version of the **generate-questions** function.
 ### Multiplayer Scoring Algorithm
 
 ```typescript
@@ -440,6 +442,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 
 Made with ❤️ and ☕
+
 
 
 
