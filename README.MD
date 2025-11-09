@@ -438,8 +438,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **⭐ Star this repo if you found it helpful!**
-[![GitHub stars](https://img.shields.io/github/stars/bero-ax/codeiq?style=social)](https://github.com/bero-ax/codeiq)
+[![GitHub stars](https://img.shields.io/github/stars/berenars/codeiq?style=social)](https://github.com/berenars/codeiq)
 
 
 Made with ❤️ and ☕
+
 
