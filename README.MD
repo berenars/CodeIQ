@@ -261,7 +261,7 @@ CREATE TABLE players (
 ---
 
 ## 💻 Code Highlights
-
+**Note:** This is a shortened version of the **generate-questions** function.
 ### Edge Function: AI Question Generation
 
 ```typescript
@@ -304,7 +304,6 @@ at ${difficulty} difficulty for level ${level}. Return JSON with this structure:
   });
 });
 ```
-**Note:** This is a shortened version of the **generate-questions** function.
 ### Multiplayer Scoring Algorithm
 
 ```typescript
@@ -442,6 +441,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 
 Made with ❤️ and ☕
+
 
 
 
