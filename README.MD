@@ -62,7 +62,7 @@ CodeIQ is a cross-platform educational app designed to help students master comp
 - Live leaderboard updates after each question
 - Animated podium reveal for final rankings
 - Synchronized gameplay across all devices
-
+---
 ### 🏆 Comprehensive Achievement System
 
 14 built-in achievement:
@@ -415,6 +415,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 
 Made with ❤️ and ☕
+
 
 
 
