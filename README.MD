@@ -63,32 +63,6 @@ CodeIQ is a cross-platform educational app designed to help students master comp
 - Animated podium reveal for final rankings
 - Synchronized gameplay across all devices
 
-### 🧠 AI-Powered Question Generation (Offline Mode)
-```
-// DeepSeek AI integration via Supabase Edge Functions
-export async function generateOfflineQuestions(
-  topicId: string,
-  level: number
-): Promise<Question[]> {
-
-  const difficulty = level >= 25 ? 'extra_spicy' 
-                   : level >= 10 ? 'spicy' 
-                   : 'mild';
-
-  const { data } = await supabase.functions.invoke('generate-questions', {
-    body: {
-      topicId,
-      topics: [TOPIC_PROMPTS[topicId]],
-      difficulty,
-      numQuestions: 8,
-      level
-    }
-  });
-
-  return data.questions;
-}
-```
-
 ### 🏆 Comprehensive Achievement System
 
 14 built-in achievement:
@@ -441,6 +415,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 
 Made with ❤️ and ☕
+
 
 
 
