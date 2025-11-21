@@ -1,13 +1,15 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useColorScheme, View } from 'react-native';
+import { View } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { useEffect } from 'react';
 import * as SystemUI from 'expo-system-ui';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+function RootLayoutContent() {
+  const { currentScheme } = useTheme();
+  const colors = Colors[currentScheme];
 
   useEffect(() => {
     SystemUI.setBackgroundColorAsync(colors.background);
@@ -29,7 +31,17 @@ export default function RootLayout() {
         <Stack.Screen name="sign-in" />
         <Stack.Screen name="sign-up" />
       </Stack>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} backgroundColor={colors.background} />
+      <StatusBar style={currentScheme === 'dark' ? 'light' : 'dark'} backgroundColor={colors.background} />
     </View>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <RootLayoutContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

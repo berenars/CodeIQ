@@ -1,24 +1,53 @@
-import { View, Text, StyleSheet, TouchableOpacity, Animated, useColorScheme } from 'react-native';
-import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, useColorScheme, ActivityIndicator, Image } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/Colors';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Index() {
   const [buttonPressed, setButtonPressed] = useState(false);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const { user, loading } = useAuth();
+  const hasRedirectedRef = useRef(false);
+
+  // Redirect to tabs if user is already logged in (only once on mount)
+  useEffect(() => {
+    if (!loading && user && !hasRedirectedRef.current) {
+      hasRedirectedRef.current = true;
+      router.replace('/(tabs)');
+    }
+  }, [user, loading]);
+
+  // Show loading screen while checking authentication
+  if (loading) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  // Don't render the welcome screen if user is logged in (will redirect)
+  if (user) {
+    return null;
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Learn by doing section - to be implemented later */}
+      {/* Logo section */}
       <View style={styles.heroSection}>
-        {/* Empty space for now */}
+        <Image
+          source={require('@/assets/images/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
       </View>
 
       {/* Tagline */}
       <View style={styles.taglineContainer}>
         <Text style={[styles.tagline, { color: colors.textSecondary }]}>
-          Interactive problem solving that's effective and fun. Get smarter in 15 minutes a day.
+        Turn learning into a game. Compete, solve problems, and level up your computer science skills in just a few minutes a day.
         </Text>
       </View>
 
@@ -59,6 +88,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 60,
+  },
+  logo: {
+    width: 550,
+    height: 550,
+    maxWidth: '100%',
   },
   taglineContainer: {
     paddingHorizontal: 40,

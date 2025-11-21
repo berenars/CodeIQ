@@ -1,0 +1,10 @@
+https://supabase.com/docs/reference/kotlin/auth-signout
+https://supabase.com/docs/reference/javascript/v1/auth-signin
+https://supabase.com/docs/guides/auth
+https://supabase.com/docs/reference/swift/auth-verifyotp
+https://supabase.com/docs/reference/csharp/auth-verifyotp
+https://supabase.com/docs/reference/python/auth-signout
+https://supabase.com/docs/reference/dart/auth-signout
+https://supabase.com/docs/guides/auth/signout
+https://supabase.com/docs/guides/auth/server-side/advanced-guide
+https://www.restack.io/

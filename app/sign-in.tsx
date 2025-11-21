@@ -1,7 +1,9 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, useColorScheme, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, useColorScheme, Animated, Alert, ActivityIndicator, Platform } from 'react-native';
 import { useState, useRef } from 'react';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/Colors';
+import { signIn } from '@/lib/auth';
+import { CustomAlert } from '@/components/CustomAlert';
 
 export default function SignIn() {
   const colorScheme = useColorScheme();
@@ -9,25 +11,73 @@ export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [buttonPressed, setButtonPressed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{ visible: boolean; title: string; message: string }>({
+    visible: false,
+    title: '',
+    message: '',
+  });
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
   const isFormValid = email.length > 0 && password.length > 0;
 
-  const handleSignIn = () => {
-    if (!isFormValid) return;
-    
-    // Fade out animation
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => {
-      router.replace('/(tabs)');
-    });
+  const showCustomAlert = (title: string, message: string) => {
+    if (Platform.OS === 'ios') {
+      Alert.alert(title, message);
+    } else {
+      setAlertConfig({ visible: true, title, message });
+    }
   };
+
+  const handleSignIn = async () => {
+    if (!isFormValid || loading) return;
+    
+    setLoading(true);
+    
+    try {
+      const { user, error } = await signIn(email, password);
+      
+      if (error) {
+        showCustomAlert('Sign In Error', error.message || 'Failed to sign in. Please try again.');
+        setLoading(false);
+        return;
+      }
+      
+      if (user) {
+        // Fade out animation
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start(() => {
+          router.replace('/(tabs)');
+          setLoading(false);
+        });
+      }
+    } catch (err) {
+      showCustomAlert('Error', 'An unexpected error occurred. Please try again.');
+      setLoading(false);
+    }
+  };
+
 
   return (
     <Animated.View style={[styles.container, { backgroundColor: colors.background, opacity: fadeAnim }]}>
+      {/* Custom Alert for Android/Web */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        buttons={[
+          {
+            text: 'OK',
+            style: 'default',
+            onPress: () => setAlertConfig({ ...alertConfig, visible: false }),
+          },
+        ]}
+        onDismiss={() => setAlertConfig({ ...alertConfig, visible: false })}
+      />
+
       {/* Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Text style={[styles.backIcon, { color: colors.backIcon }]}>‹</Text>
@@ -39,7 +89,9 @@ export default function SignIn() {
 
         {/* Social Login Buttons */}
         <View style={styles.socialButtonsContainer}>
-          <TouchableOpacity style={[styles.socialButton, { backgroundColor: colors.socialButtonBg, borderColor: colors.inputBorder }]}>
+          <TouchableOpacity 
+            style={[styles.socialButton, { backgroundColor: colors.socialButtonBg, borderColor: colors.inputBorder }]}
+          >
             <Image 
               source={require('@/assets/images/apple-icon.png')} 
               style={styles.socialIcon}
@@ -47,7 +99,9 @@ export default function SignIn() {
             />
           </TouchableOpacity>
           
-          <TouchableOpacity style={[styles.socialButton, { backgroundColor: colors.socialButtonBg, borderColor: colors.inputBorder }]}>
+          <TouchableOpacity 
+            style={[styles.socialButton, { backgroundColor: colors.socialButtonBg, borderColor: colors.inputBorder }]}
+          >
             <Image 
               source={require('@/assets/images/google-icon.png')} 
               style={styles.socialIcon}
@@ -90,19 +144,24 @@ export default function SignIn() {
           style={[
             styles.signInButton,
             { 
-              backgroundColor: isFormValid ? colors.primary : colors.disabledButton,
-              shadowColor: isFormValid ? colors.primaryShadow : 'transparent',
+              backgroundColor: (isFormValid && !loading) ? colors.primary : colors.disabledButton,
+              shadowColor: (isFormValid && !loading) ? colors.primaryShadow : 'transparent',
             },
-            buttonPressed && isFormValid && styles.signInButtonPressed
+            buttonPressed && isFormValid && !loading && styles.signInButtonPressed
           ]}
           onPressIn={() => setButtonPressed(true)}
           onPressOut={() => setButtonPressed(false)}
           onPress={handleSignIn}
           activeOpacity={1}
+          disabled={loading || !isFormValid}
         >
-          <Text style={[styles.signInButtonText, { color: isFormValid ? colors.buttonText : colors.disabledButtonText }]}>
-            Sign in
-          </Text>
+          {loading ? (
+            <ActivityIndicator color={colors.buttonText} />
+          ) : (
+            <Text style={[styles.signInButtonText, { color: (isFormValid && !loading) ? colors.buttonText : colors.disabledButtonText }]}>
+              Sign in
+            </Text>
+          )}
         </TouchableOpacity>
 
         {/* Forgot Password */}

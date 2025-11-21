@@ -1,7 +1,9 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, useColorScheme, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, useColorScheme, Animated, Alert, ActivityIndicator, Platform } from 'react-native';
 import { useState, useRef } from 'react';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/Colors';
+import { signUp } from '@/lib/auth';
+import { CustomAlert } from '@/components/CustomAlert';
 
 export default function SignUp() {
   const colorScheme = useColorScheme();
@@ -10,25 +12,100 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [buttonPressed, setButtonPressed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{ 
+    visible: boolean; 
+    title: string; 
+    message: string;
+    onConfirm?: () => void;
+  }>({
+    visible: false,
+    title: '',
+    message: '',
+  });
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
   const isFormValid = email.length > 0 && password.length > 0 && username.length > 0;
 
-  const handleSignUp = () => {
-    if (!isFormValid) return;
+  const showCustomAlert = (title: string, message: string, onConfirm?: () => void) => {
+    if (Platform.OS === 'ios') {
+      if (onConfirm) {
+        Alert.alert(title, message, [{ text: 'OK', onPress: onConfirm }]);
+      } else {
+        Alert.alert(title, message);
+      }
+    } else {
+      setAlertConfig({ visible: true, title, message, onConfirm });
+    }
+  };
+
+  const handleSignUp = async () => {
+    if (!isFormValid || loading) return;
     
-    // Fade out animation
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => {
-      router.replace('/(tabs)');
-    });
+    // Validate password length
+    if (password.length < 6) {
+      showCustomAlert('Invalid Password', 'Password must be at least 6 characters long.');
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      const { user, error } = await signUp(email, password, username);
+      
+      if (error) {
+        showCustomAlert('Sign Up Error', error.message || 'Failed to create account. Please try again.');
+        setLoading(false);
+        return;
+      }
+      
+      if (user) {
+        // Check if email confirmation is required
+        if (user.identities && user.identities.length === 0) {
+          showCustomAlert(
+            'Confirm Your Email',
+            'Please check your email and click the confirmation link to activate your account.',
+            () => router.push('/sign-in')
+          );
+          setLoading(false);
+        } else {
+          // Fade out animation and navigate
+          Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }).start(() => {
+            router.replace('/(tabs)');
+            setLoading(false);
+          });
+        }
+      }
+    } catch (err) {
+      showCustomAlert('Error', 'An unexpected error occurred. Please try again.');
+      setLoading(false);
+    }
   };
 
   return (
     <Animated.View style={[styles.container, { backgroundColor: colors.background, opacity: fadeAnim }]}>
+      {/* Custom Alert for Android/Web */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        buttons={[
+          {
+            text: 'OK',
+            style: 'default',
+            onPress: () => {
+              setAlertConfig({ ...alertConfig, visible: false });
+              alertConfig.onConfirm?.();
+            },
+          },
+        ]}
+        onDismiss={() => setAlertConfig({ ...alertConfig, visible: false })}
+      />
+
       {/* Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Text style={[styles.backIcon, { color: colors.backIcon }]}>‹</Text>
@@ -72,19 +149,24 @@ export default function SignUp() {
           style={[
             styles.signUpButton,
             { 
-              backgroundColor: isFormValid ? colors.primary : colors.disabledButton,
-              shadowColor: isFormValid ? colors.primaryShadow : 'transparent',
+              backgroundColor: (isFormValid && !loading) ? colors.primary : colors.disabledButton,
+              shadowColor: (isFormValid && !loading) ? colors.primaryShadow : 'transparent',
             },
-            buttonPressed && isFormValid && styles.signUpButtonPressed
+            buttonPressed && isFormValid && !loading && styles.signUpButtonPressed
           ]}
           onPressIn={() => setButtonPressed(true)}
           onPressOut={() => setButtonPressed(false)}
           onPress={handleSignUp}
           activeOpacity={1}
+          disabled={loading || !isFormValid}
         >
-          <Text style={[styles.signUpButtonText, { color: isFormValid ? colors.buttonText : colors.disabledButtonText }]}>
-            Sign up
-          </Text>
+          {loading ? (
+            <ActivityIndicator color={colors.buttonText} />
+          ) : (
+            <Text style={[styles.signUpButtonText, { color: (isFormValid && !loading) ? colors.buttonText : colors.disabledButtonText }]}>
+              Sign up
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -100,7 +182,7 @@ export default function SignUp() {
 
         {/* Terms and Privacy */}
         <Text style={[styles.termsText, { color: colors.inputPlaceholder }]}>
-          By tapping 'Sign up', I agree to Brilliant's{'\n'}
+          By tapping 'Sign up', I agree to CodeIQ's{'\n'}
           <Text style={[styles.termsLink, { color: colors.text }]}>Terms</Text> and <Text style={[styles.termsLink, { color: colors.text }]}>Privacy Policy</Text>
         </Text>
       </View>
